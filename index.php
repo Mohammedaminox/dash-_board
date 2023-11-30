@@ -23,6 +23,7 @@
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
     />
+  
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
@@ -204,7 +205,6 @@
         margin-top: 10px;
         font-size: 13px;
       }
-
       /* Custom checkbox */
       .custom-checkbox {
         position: relative;
@@ -307,7 +307,48 @@
       .modal form label {
         font-weight: normal;
       }
-    </style>
+
+      /* Style for the container holding the statistics cards */
+#nav-statistique {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+}
+
+/* Style for each statistics card */
+.statics_card {
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.statics_card:hover {
+  transform: scale(1.05);
+}
+
+/* Style for the icons inside the cards */
+.statics_card i {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+/* Style for the title of each statistics card */
+.static_info h5 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+/* Style for the number/count in each statistics card */
+.static_info p {
+  font-size: 24px;
+  font-weight: bold;
+  color: #3498db; /* or your preferred color */
+}
+
+   </style>
     <script>
       $(document).ready(function () {
         // Activate tooltip
@@ -339,8 +380,6 @@
     <?php
       $conn = new mysqli("localhost","root","","myressources");
       $results_user = $conn-> query("SELECT * FROM utilisateur");
-      $results_squad = $conn-> query("SELECT * FROM squad");
-      $results_projet = $conn-> query("SELECT * FROM projet");
       $results_ressources = $conn-> query("SELECT * FROM ressources");
       $results_category = $conn-> query("SELECT * FROM category");
       $results_SubCategory = $conn-> query("SELECT * FROM subcategory");
@@ -359,30 +398,6 @@
           aria-selected="true"
         >
           Utilisateur
-        </button>
-        <button
-          class="nav-link"
-          id="nav-Squad-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#nav-Squad"
-          type="button"
-          role="tab"
-          aria-controls="nav-Squad"
-          aria-selected="false"
-        >
-          Squad
-        </button>
-        <button
-          class="nav-link"
-          id="nav-Projet-tab"
-          data-bs-toggle="tab"
-          data-bs-target="#nav-Projet"
-          type="button"
-          role="tab"
-          aria-controls="nav-Projet"
-          aria-selected="false"
-        >
-          Projet
         </button>
         <button
           class="nav-link"
@@ -419,6 +434,18 @@
           aria-selected="false"
         >
           SubCategorie
+        </button>
+        <button
+          class="nav-link"
+          id="nav-statistique-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#nav-statistique"
+          type="button"
+          role="tab"
+          aria-controls="nav-statistique"
+          aria-selected="false"
+        >
+          statistique
         </button>
       </div>
     </nav>
@@ -488,12 +515,10 @@
                         <td>' . $row["email"] . '</td>
                         <td>
                           <a
-                            href="#editUserModal"
+                            href="updateuser.php?id=' . $row["user_id"] . '"
                             class="edit"
-                            data-toggle="modal"
                             ><i
                               class="material-icons"
-                              data-toggle="tooltip"
                               title="Edit"
                               >&#xE254;</i
                             ></a
@@ -569,56 +594,6 @@
             </div>
           </div>
           <!-- Edit Modal HTML -->
-          <div id="editUserModal" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form >
-                  <div class="modal-header">
-                    <h4 class="modal-title">Edit User</h4>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-hidden="true"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <label>ID</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Name</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Email</label>
-                      <input type="email" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Role</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Squad_id</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <input
-                      type="button"
-                      class="btn btn-default"
-                      data-dismiss="modal"
-                      value="Cancel"
-                    />
-                    <input type="submit" class="btn btn-info" value="Save" />
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
       <div
@@ -627,174 +602,6 @@
         role="tabpanel"
         aria-labelledby="nav-Squad-tab"
       >
-        <div class="all">
-          <div class="container-xl">
-            <div class="table-responsive">
-              <div class="table-wrapper">
-                <div class="table-title">
-                  <div class="row">
-                    <div class="col-sm-6">
-                      <h2>Manage <b>Squad</b></h2>
-                    </div>
-                    <div class="col-sm-6">
-                      <a
-                        href="#addSquadModal"
-                        class="btn btn-success"
-                        data-toggle="modal"
-                        ><i class="material-icons">&#xE147;</i>
-                        <span>Add New Squad</span></a
-                      >
-                    </div>
-                  </div>
-                </div>
-                <table class="table table-striped table-hover">
-                  <thead>
-                    <tr>
-                      <th>
-                        <span class="custom-checkbox">
-                          <input type="checkbox" id="selectAll" />
-                          <label for="selectAll"></label>
-                        </span>
-                      </th>
-                      <th>Squad_ID</th>
-                      <th>Name</th>
-                      <th>Projet_id</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                      while($row = $results_squad -> fetch_assoc()){
-                        echo'
-                        <tr>
-                        <td>
-                          <span class="custom-checkbox">
-                            <input
-                              type="checkbox"
-                              id="checkbox4"
-                              name="options[]"
-                              value="1"
-                            />
-                            <label for="checkbox4"></label>
-                          </span>
-                        </td>
-                        <td>' . $row["squad_id"] . '</td>
-                        <td>' . $row["name"] . '</td>
-                        <td>' . $row["projet_id"] . '</td>
-                        <td>
-                          <a
-                            href="#editSquadModal"
-                            class="edit"
-                            data-toggle="modal"
-                            ><i
-                              class="material-icons"
-                              data-toggle="tooltip"
-                              title="Edit"
-                              >&#xE254;</i
-                            ></a
-                          >
-                          <a
-                          href="deleteSquad.php?id=' . $row["squad_id"] . '"
-                            class="delete"
-                            ><i
-                              class="material-icons"
-                              title="Delete"
-                              >&#xE872;</i
-                            ></a
-                          >
-                        </td>
-                      </tr> ';
-                      };
-                    ?>
-                    
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <!-- Edit Modal HTML -->
-          <div id="addSquadModal" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form method="POST" action="addSquad.php">
-                  <div class="modal-header">
-                    <h4 class="modal-title">Add Squad</h4>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-hidden="true"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <label>Name</label>
-                      <input type="text" name="projet_name" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Projet_id</label>
-                      <input type="text" name="projet_id" class="form-control" required />
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <input
-                      type="button"
-                      class="btn btn-default"
-                      data-dismiss="modal"
-                      value="Cancel"
-                    />
-                    <input type="submit" name="Submit" class="btn btn-success" value="Add" />
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-          <!-- Edit Modal HTML -->
-          <div id="editSquadModal" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form>
-                  <div class="modal-header">
-                    <h4 class="modal-title">Edit Squad</h4>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-hidden="true"
-                    >
-                      &times;    
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <label>ID</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Name</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Projet_id</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <input
-                      type="button"
-                      class="btn btn-default"
-                      data-dismiss="modal"
-                      value="Cancel"
-                    />
-                    <input type="submit" class="btn btn-info" value="Save" />
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <div
         class="tab-pane fade"
@@ -802,204 +609,6 @@
         role="tabpanel"
         aria-labelledby="nav-Projet-tab"
       >
-        <div class="all">
-          <div class="container-xl">
-            <div class="table-responsive">
-              <div class="table-wrapper">
-                <div class="table-title">
-                  <div class="row">
-                    <div class="col-sm-6">
-                      <h2>Manage <b>Projet</b></h2>
-                    </div>
-                    <div class="col-sm-6">
-                      <a
-                        href="#addProjetModal"
-                        class="btn btn-success"
-                        data-toggle="modal"
-                        ><i class="material-icons">&#xE147;</i>
-                        <span>Add New Projet</span></a
-                      >
-                    </div>
-                  </div>
-                </div>
-                <table class="table table-striped table-hover">
-                  <thead>
-                    <tr>
-                      <th>
-                        <span class="custom-checkbox">
-                          <input type="checkbox" id="selectAll" />
-                          <label for="selectAll"></label>
-                        </span>
-                      </th>
-                      <th>Projet_ID</th>
-                      <th>Name</th>
-                      <th>Description</th>
-                      <th>Date_debut</th>
-                      <th>Date_fin</th>
-                      <th>Ressources_id</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php 
-                      while($row = $results_projet -> fetch_assoc()){
-                        echo '                    <tr>
-                        <td>
-                          <span class="custom-checkbox">
-                            <input
-                              type="checkbox"
-                              id="checkbox1"
-                              name="options[]"
-                              value="1"
-                            />
-                            <label for="checkbox1"></label>
-                          </span>
-                        </td>
-                        <td>' . $row["projet_id"] . '</td>
-                        <td>' . $row["name"] . '</td>
-                        <td>' . $row["description"] . '</td>
-                        <td>' . $row["date_debut"] . '</td>
-                        <td>' . $row["date_fin"] . '</td>
-                        <td>' . $row["ressources_id"] . '</td>
-                        <td>
-                          <a
-                            href="#editProjetModal"
-                            class="edit"
-                            data-toggle="modal"
-                            ><i
-                              class="material-icons"
-                              data-toggle="tooltip"
-                              title="Edit"
-                              >&#xE254;</i
-                            ></a
-                          >
-                          <a
-                          href="deleteprojet.php?id=' . $row["projet_id"] . '"
-                            class="delete"
-                            ><i
-                              class="material-icons"
-                              title="Delete"
-                              >&#xE872;</i
-                            ></a
-                          >
-                        </td>
-                      </tr>';
-                      };
-                    
-                    ?>
-
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <!-- Edit Modal HTML -->
-          <div id="addProjetModal" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form method="POST" action="addProjet.php">
-                  <div class="modal-header">
-                    <h4 class="modal-title">Add Projet</h4>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-hidden="true"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <label>Name</label>
-                      <input type="text" name="projet_name" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Description</label>
-                      <textarea class="form-control" name="projet_description" required></textarea>
-                    </div>
-                    <div class="form-group">
-                      <label>Date_debut</label>
-                      <input type="date" name="projet_date_debut" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Date_fin</label>
-                      <input type="date" name="projet_date_fin" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Ressources_id</label>
-                      <input type="text" name="ressources_id" class="form-control" required />
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <input
-                      type="button"
-                      class="btn btn-default"
-                      data-dismiss="modal"
-                      value="Cancel"
-                    />
-                    <input type="submit" name="submit" class="btn btn-success" value="Add" />
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-          <!-- Edit Modal HTML -->
-          <div id="editProjetModal" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form>
-                  <div class="modal-header">
-                    <h4 class="modal-title">Edit Projet</h4>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-hidden="true"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <label>Projet_ID</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Name</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Description</label>
-                      <textarea class="form-control" required></textarea>
-                    </div>
-                    <div class="form-group">
-                      <label>Date_debut</label>
-                      <input type="date" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Date_fin</label>
-                      <input type="date" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Ressources_id</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <input
-                      type="button"
-                      class="btn btn-default"
-                      data-dismiss="modal"
-                      value="Cancel"
-                    />
-                    <input type="submit" class="btn btn-info" value="Save" />
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <div
         class="tab-pane fade"
@@ -1062,12 +671,10 @@
                         <td>' . $row["subcategory_id"] . '</td>
                         <td>
                           <a
-                            href="#editRessourcesModal"
+                            href="updateressources.php?id=' . $row["ressources_id"] . '"
                             class="edit"
-                            data-toggle="modal"
                             ><i
                               class="material-icons"
-                              data-toggle="tooltip"
                               title="Edit"
                               >&#xE254;</i
                             ></a
@@ -1124,88 +731,6 @@
                       value="Cancel"
                     />
                     <input type="submit" name="SUBMIT" class="btn btn-success" value="Add" />
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-          <!-- Edit Modal HTML -->
-          <div id="editRessourcesModal" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form>
-                  <div class="modal-header">
-                    <h4 class="modal-title">Edit Ressources</h4>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-hidden="true"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <label>Ressources_ID</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Name</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>SubCategorie_id</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <input
-                      type="button"
-                      class="btn btn-default"
-                      data-dismiss="modal"
-                      value="Cancel"
-                    />
-                    <input type="submit" class="btn btn-info" value="Save" />
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-          <!-- Delete Modal HTML -->
-          <div id="deleteRessourcesModal" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form>
-                  <div class="modal-header">
-                    <h4 class="modal-title">Delete Ressources</h4>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-hidden="true"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <p>Are you sure you want to delete these Records?</p>
-                    <p class="text-warning">
-                      <small>This action cannot be undone.</small>
-                    </p>
-                  </div>
-                  <div class="modal-footer">
-                    <input
-                      type="button"
-                      class="btn btn-default"
-                      data-dismiss="modal"
-                      value="Cancel"
-                    />
-                    <input
-                      type="submit"
-                      class="btn btn-danger"
-                      value="Delete"
-                    />
                   </div>
                 </form>
               </div>
@@ -1273,12 +798,10 @@
                         <td>' . $row["category_name"] . '</td>
                         <td>
                           <a
-                            href="#editCategoryModal"
+                            href="updatecategory.php?id=' . $row["category_id"] . '"
                             class="edit"
-                            data-toggle="modal"
                             ><i
                               class="material-icons"
-                              data-toggle="tooltip"
                               title="Edit"
                               >&#xE254;</i
                             ></a
@@ -1337,46 +860,7 @@
               </div>
             </div>
           </div>
-          <!-- Edit Modal HTML -->
-          <div id="editCategoryModal" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form>
-                  <div class="modal-header">
-                    <h4 class="modal-title">Edit Category</h4>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-hidden="true"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <label>Category_ID</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Name</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <input
-                      type="button"
-                      class="btn btn-default"
-                      data-dismiss="modal"
-                      value="Cancel"
-                    />
-                    <input type="submit" class="btn btn-info" value="Save" />
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-          <!-- Delete Modal HTML -->
+
         </div>
       </div>
       <div
@@ -1440,12 +924,10 @@
                         <td>' . $row["category_id"] . '</td>
                         <td>
                           <a
-                            href="#editSubCategoryModal"
+                            href="updatesubcategory.php?id=' . $row["subcategory_id"] . '"
                             class="edit"
-                            data-toggle="modal"
                             ><i
                               class="material-icons"
-                              data-toggle="tooltip"
                               title="Edit"
                               >&#xE254;</i
                             ></a
@@ -1507,51 +989,42 @@
               </div>
             </div>
           </div>
-          <!-- Edit Modal HTML -->
-          <div id="editSubCategoryModal" class="modal fade">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form>
-                  <div class="modal-header">
-                    <h4 class="modal-title">Edit SubCategory</h4>
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-hidden="true"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="form-group">
-                      <label>SubCategory_ID</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Name</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                    <div class="form-group">
-                      <label>Categorie_id</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <input
-                      type="button"
-                      class="btn btn-default"
-                      data-dismiss="modal"
-                      value="Cancel"
-                    />
-                    <input type="submit" class="btn btn-info" value="Save" />
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-          <!-- Delete Modal HTML -->
         </div>
+
+        
+      </div>
+      <div
+      class="tab-pane fade"
+      id="nav-statistique"
+      role="tabpanel"
+      aria-labelledby="nav-statistique-tab"
+    >
+    <figure class="statics_card">
+                  <div class="static_info">
+                    <h5>User Table</h5>
+                    <p><?php echo $results_user->num_rows ?></p>
+                  </div>
+              </figure>
+              <figure class="statics_card">
+                  <div class="static_info">
+                    <h5>Ressource Table</h5>
+                    <p><?php echo $results_ressources->num_rows ?></p>
+                  </div>
+              </figure>
+              <figure class="statics_card">
+                  <div class="static_info">
+                    <h5>Category Table</h5>
+                    <p><?php echo $results_category->num_rows ?></p>
+                  </div>
+              </figure>
+              <figure class="statics_card">
+                  <div class="static_info">
+                    <h5>SubCategory Table</h5>
+                    <p><?php echo $results_SubCategory->num_rows ?></p>
+                  </div>
+    </figure>
+          
+          
     </div>
   </body>
 </html>
